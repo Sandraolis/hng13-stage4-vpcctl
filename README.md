@@ -1,12 +1,27 @@
 
 # 🧩 Stage 4 DevOps Project — Build My Own Virtual Private Cloud (VPC) on Linux
 
-This project simulates an AWS-like VPC environment entirely using **Linux networking tools** such as:
-- `ip`, `ip netns`, `ip link`, `bridge`
-- `iptables`
-- Bash scripting for automation
 
-The goal is to create isolated VPCs, subnets, NAT gateways, and firewall rules — just like in a real cloud environment.
+🌐 Overview
+
+This project recreates the fundamentals of an AWS-like Virtual Private Cloud (VPC) entirely on Linux using only native networking tools (ip, iptables, bridge, and veth).
+
+The project demonstrates how to:
+
+Create isolated VPCs with unique CIDR ranges.
+
+Add subnets (public and private) using Linux network namespaces.
+
+Configure routing and NAT gateways for internet access.
+
+Enforce firewall rules (security groups) using iptables.
+
+Deploy a web application in a public subnet and verify connectivity.
+
+Implement full automation with Bash scripts for setup and cleanup.
+
+
+
 
 ---
 
@@ -22,24 +37,46 @@ The goal is to create isolated VPCs, subnets, NAT gateways, and firewall rules �
 
 ##  Architecture Overview
 
-               ┌──────────────────────────────┐
-               │        HOST MACHINE          │
-               │   (Ubuntu VM - VirtualBox)   │
-               │                              │
-               │   +----------------------+   │
-               │   | Bridge: br_vpcA      |   │
-               │   | Acts as VPC Router   |   │
-               │   +----------┬-----------+   │
-               │              │               │
-    ┌──────────┴────────────┐ │ ┌───────────┴───────────┐
-    │ ns_vpcA_public1       │ │ │ ns_vpcA_private1      │
-    │ Public Subnet (10.20) │ │ │ Private Subnet (10.20)│
-    │ NAT + Web Server      │ │ │ Internal Only         │
-    └───────────────────────┘ │ └───────────────────────┘
-               │
-          Internet Access
-         via Host Interface
 
+                 ┌──────────────────────────────────────────┐
+                 │               Host Machine               │
+                 │   (Ubuntu on VirtualBox)                 │
+                 └──────────────────────────────────────────┘
+                                │
+               ┌────────────────┴────────────────┐
+               │                                 │
+     ┌─────────────────────┐          ┌─────────────────────┐
+     │       VPC A         │          │       VPC B         │
+     │   CIDR: 10.20.0.0/16│          │   CIDR: 10.30.0.0/16│
+     │ Bridge: br_vpcA     │          │ Bridge: br_vpcB     │
+     │                     │          │                     │
+     │  ┌──────────────┐   │          │  ┌──────────────┐   │
+     │  │ Public Subnet│   │          │  │ Public Subnet│   │
+     │  │ 10.20.1.0/24 │   │          │  │ 10.30.1.0/24 │   │
+     │  │ NAT + HTTP   │   │          │  │ NAT + HTTP   │   │
+     │  └──────────────┘   │          │  └──────────────┘   │
+     │  ┌──────────────┐   │          │  ┌──────────────┐   │
+     │  │ Private Subnet│  │          │  │ Private Subnet│  │
+     │  │ 10.20.2.0/24 │   │          │  │ 10.30.2.0/24 │   │
+     │  │ Internal only│   │          │  │ Internal only│   │
+     │  └──────────────┘   │          │  └──────────────┘   │
+     └─────────────────────┘          └─────────────────────┘
+
+
+✅ Deploy and test the web application
+
+sudo bash test_webapp.sh
+
+
+✅ Expected Output
+
+[*] Launching simple web server in ns_vpcA_public1 ...
+[+] Web server successfully started on port 80 inside ns_vpcA_public1
+[*] Testing connectivity from host ...
+[✓] Host can reach the web app in public subnet (10.20.1.10)
+[*] Testing connectivity from private subnet ...
+[✓] Private subnet is correctly isolated (no access to public app)
+[+] Test complete.
 
 
 
@@ -56,10 +93,24 @@ subnet add → to add subnets inside a VPC
 
 NAT enable → to allow internet access for public subnets
 
+test_webapp.sh → Deploys and tests a sample web server in the public subnet.
+
 firewall apply → to enforce security group–style rules
 
 and destroy-all → to clean up all resources after testing.
 
+
+🧱 Tools Used
+
+Ubuntu 22.04 LTS
+
+VirtualBox 7.0.24
+
+iproute2, bridge-utils, iptables
+
+Bash scripting
+
+Python HTTP server (for app test)
 
 
 # 🧱 Firewall Rules Example (rules.json)
