@@ -49,10 +49,15 @@ I built a custom CLI tool called vpcctl, written in Bash.
 It automates the creation of VPCs, subnets, bridges, NAT gateways, firewall policies, and cleanup — just like AWS VPC operations.
 The CLI supports commands such as:
 
+
 vpc create → to create a new virtual VPC
+
 subnet add → to add subnets inside a VPC
+
 NAT enable → to allow internet access for public subnets
+
 firewall apply → to enforce security group–style rules
+
 and destroy-all → to clean up all resources after testing.
 
 
