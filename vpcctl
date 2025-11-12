@@ -1,0 +1,161 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# ============================================================
+# vpcctl - Bash CLI to simulate AWS-like VPCs using Linux
+# namespaces, bridges, veth pairs, and iptables for NAT/firewall
+# ============================================================
+
+LOG_FILE="./vpcctl.log"
+log() { echo -e "$1" | tee -a "$LOG_FILE"; }
+
+usage() {
+  echo "Usage:"
+  echo "  sudo ./vpcctl vpc create <vpc_name> <cidr>"
+  echo "  sudo ./vpcctl subnet add <vpc_name> <subnet_name> <cidr>"
+  echo "  sudo ./vpcctl nat enable <vpc_name> <subnet_name>"
+  echo "  sudo ./vpcctl firewall apply <namespace> <rule_file>"
+  echo "  sudo ./vpcctl destroy-all"
+}
+
+# -------------------------
+# Function: Create VPC
+# -------------------------
+vpc_create() {
+  local vpc=$1; local cidr=$2
+  local br="br_${vpc}"
+
+  log "[+] Creating VPC: $vpc with bridge $br"
+
+  # Delete old bridge if it exists
+  if ip link show "$br" &>/dev/null; then
+    log "[!] Bridge $br already exists — deleting old instance..."
+    sudo ip link set "$br" down 2>/dev/null || true
+    sudo ip link del "$br" 2>/dev/null || true
+  fi
+
+  sudo ip link add name "$br" type bridge
+  sudo ip addr add "${cidr%0/16}1/16" dev "$br" 2>/dev/null || true
+  sudo ip link set "$br" up
+
+  log "[+] VPC $vpc created successfully."
+}
+
+# -------------------------
+# Function: Add Subnet
+# -------------------------
+subnet_add() {
+  local vpc=$1; local subnet=$2; local cidr=$3
+  local ns="ns_${vpc}_${subnet}"
+  local veth_h="${vpc}_${subnet}h"
+  local veth_n="${vpc}_${subnet}n"
+  local br="br_${vpc}"
+  local gw=$(echo "$cidr" | sed 's|0/24|1|')
+
+  log "[+] Creating subnet $subnet in $vpc"
+
+  # Delete old namespace or veth pair if they exist
+  if sudo ip netns list | grep -q "$ns"; then
+    log "[!] Namespace $ns already exists — deleting old instance..."
+    sudo ip netns del "$ns"
+  fi
+  if ip link show "$veth_h" &>/dev/null; then
+    log "[!] Old veth $veth_h found — deleting..."
+    sudo ip link del "$veth_h"
+  fi
+
+  sudo ip netns add "$ns"
+  sudo ip link add "$veth_h" type veth peer name "$veth_n"
+  sudo ip link set "$veth_n" netns "$ns"
+  sudo ip link set "$veth_h" master "$br"
+  sudo ip netns exec "$ns" ip addr add "${gw}/24" dev "$veth_n"
+  sudo ip netns exec "$ns" ip link set "$veth_n" up
+  sudo ip link set "$veth_h" up
+  sudo ip netns exec "$ns" ip route add default via "$gw"
+
+  log "[+] Subnet $subnet added (ns=$ns, CIDR=$cidr, GW=$gw)"
+}
+
+# -------------------------
+# Function: Enable NAT
+# -------------------------
+nat_enable() {
+  local vpc=$1; local subnet=$2
+  local ext_if=$(ip route | grep default | awk '{print $5}' | head -n 1)
+  log "[+] Enabling NAT for $vpc ($subnet -> $ext_if)"
+  sudo iptables -t nat -A POSTROUTING -s "10.20.0.0/16" -o "$ext_if" -j MASQUERADE
+  sudo sysctl -w net.ipv4.ip_forward=1 >/dev/null
+  log "[+] NAT enabled successfully."
+}
+
+# -------------------------
+# Function: Apply Firewall Rules
+# -------------------------
+firewall_apply() {
+  local ns=$1; local rules_file=$2
+  if [[ ! -f "$rules_file" ]]; then
+    log "[!] Rule file not found: $rules_file"
+    exit 1
+  fi
+
+  log "[+] Applying firewall rules from $rules_file to namespace $ns"
+  jq -c '.ingress[]' "$rules_file" | while read -r rule; do
+    local port=$(echo "$rule" | jq -r '.port')
+    local proto=$(echo "$rule" | jq -r '.protocol')
+    local action=$(echo "$rule" | jq -r '.action')
+    if [[ "$action" == "allow" ]]; then
+      sudo ip netns exec "$ns" iptables -A INPUT -p "$proto" --dport "$port" -j ACCEPT
+      log "[+] Allowing $proto port $port"
+    else
+      sudo ip netns exec "$ns" iptables -A INPUT -p "$proto" --dport "$port" -j DROP
+      log "[+] Blocking $proto port $port"
+    fi
+  done
+  log "[+] Firewall rules applied successfully."
+}
+
+# -------------------------
+# Function: Destroy Everything
+# -------------------------
+destroy_all() {
+  log "[+] Destroying all VPCs, subnets, bridges, and rules..."
+  sudo ip netns list | awk '{print $1}' | xargs -I{} sudo ip netns del {} 2>/dev/null || true
+  sudo ip link show type bridge | awk '{print $2}' | sed 's/://' | grep br_ | xargs -I{} sudo ip link del {} 2>/dev/null || true
+  sudo ip link show type veth | awk '{print $2}' | sed 's/://' | grep -E "_public1h|_private1h|_vpc" | xargs -I{} sudo ip link del {} 2>/dev/null || true
+  sudo iptables -F; sudo iptables -t nat -F; sudo iptables -X
+  log "[+] Cleanup complete!"
+}
+
+# -------------------------
+# Main Command Parser
+# -------------------------
+case "${1:-}" in
+  vpc)
+    case "${2:-}" in
+      create) vpc_create "$3" "$4" ;;
+      *) usage ;;
+    esac
+    ;;
+  subnet)
+    case "${2:-}" in
+      add) subnet_add "$3" "$4" "$5" ;;
+      *) usage ;;
+    esac
+    ;;
+  nat)
+    case "${2:-}" in
+      enable) nat_enable "$3" "$4" ;;
+      *) usage ;;
+    esac
+    ;;
+  firewall)
+    case "${2:-}" in
+      apply) firewall_apply "$3" "$4" ;;
+      *) usage ;;
+    esac
+    ;;
+  destroy-all) destroy_all ;;
+  *) usage ;;
+esac
+

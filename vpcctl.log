@@ -1,0 +1,121 @@
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: create with bridge br_create
+[+] VPC create created successfully.
+[+] Creating subnet vpcA in add
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[!] Old veth vpcA_public1h found — deleting...
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
+[+] Destroying all VPCs, subnets, bridges, and rules...
+[+] Cleanup complete!
+[+] Creating VPC: vpcA with bridge br_vpcA
+[+] VPC vpcA created successfully.
+[+] Creating subnet public1 in vpcA
+[+] Subnet public1 added (ns=ns_vpcA_public1, CIDR=10.20.1.0/24, GW=10.20.1.1)
+[+] Creating subnet private1 in vpcA
+[+] Subnet private1 added (ns=ns_vpcA_private1, CIDR=10.20.2.0/24, GW=10.20.2.1)
+[+] Enabling NAT for vpcA (public1 -> enp0s3)
+[+] NAT enabled successfully.
+[+] Applying firewall rules from rules.json to namespace ns_vpcA_public1
+[+] Allowing tcp port 80
+[+] Blocking tcp port 22
+[+] Allowing tcp port 443
+[+] Firewall rules applied successfully.
