@@ -121,9 +121,12 @@ For example, my configuration allows ports 80 and 443 but denies port 22
 
 {
   "subnet": "10.20.1.0/24",
-  "ingress": [
+  "ingress":
+ [
     {"port": 80, "protocol": "tcp", "action": "allow"},
+
     {"port": 22, "protocol": "tcp", "action": "deny"},
+
     {"port": 443, "protocol": "tcp", "action": "allow"}
   ]
 }
